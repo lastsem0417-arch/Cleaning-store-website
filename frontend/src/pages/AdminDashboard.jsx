@@ -12,19 +12,17 @@ loadOrders()
 const loadOrders = async()=>{
 
 try{
-
 const res = await API.get("/orders")
+console.log("ORDERS:", res.data)
 setOrders(res.data)
-
 }catch(err){
-
 console.log(err)
-
 }
 
 }
 
-const totalRevenue = orders.reduce((sum,o)=>sum + o.total,0)
+// SAFE TOTAL
+const totalRevenue = orders.reduce((sum,o)=> sum + (o.total || 0),0)
 
 const avgOrder = orders.length ? Math.floor(totalRevenue/orders.length) : 0
 
@@ -38,54 +36,35 @@ return(
 Admin Dashboard
 </h1>
 
-{/* stats cards */}
+{/* STATS */}
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
 <div className="bg-white p-6 rounded shadow">
-
-<p className="text-gray-500">
-Total Orders
-</p>
-
-<h2 className="text-3xl font-bold">
-{orders.length}
-</h2>
-
+<p className="text-gray-500">Total Orders</p>
+<h2 className="text-3xl font-bold">{orders.length}</h2>
 </div>
 
 <div className="bg-white p-6 rounded shadow">
-
-<p className="text-gray-500">
-Total Revenue
-</p>
-
+<p className="text-gray-500">Total Revenue</p>
 <h2 className="text-3xl font-bold text-green-600">
 ₹{totalRevenue}
 </h2>
-
 </div>
 
 <div className="bg-white p-6 rounded shadow">
-
-<p className="text-gray-500">
-Average Order
-</p>
-
-<h2 className="text-3xl font-bold">
-₹{avgOrder}
-</h2>
-
+<p className="text-gray-500">Average Order</p>
+<h2 className="text-3xl font-bold">₹{avgOrder}</h2>
 </div>
 
 </div>
 
-{/* sales progress */}
+{/* PROGRESS */}
 
 <div className="bg-white p-6 rounded shadow mb-10">
 
 <h2 className="text-xl font-bold mb-4">
-Revenue Progress
+Revenue Progress (Target ₹5000)
 </h2>
 
 <div className="w-full bg-gray-200 rounded h-6">
@@ -94,16 +73,14 @@ Revenue Progress
 className="bg-blue-500 h-6 rounded text-white text-center text-sm"
 style={{width:`${progress}%`}}
 >
-
 {Math.floor(progress)}%
-
 </div>
 
 </div>
 
 </div>
 
-{/* recent orders */}
+{/* ORDERS TABLE */}
 
 <div className="bg-white p-6 rounded shadow">
 
@@ -114,41 +91,38 @@ Recent Orders
 <table className="w-full">
 
 <thead>
-
 <tr className="border-b">
-
-<th className="text-left p-2">
-Customer
-</th>
-
-<th className="text-left p-2">
-Phone
-</th>
-
-<th className="text-left p-2">
-Total
-</th>
-
+<th className="text-left p-2">Customer</th>
+<th className="text-left p-2">Phone</th>
+<th className="text-left p-2">Total</th>
+<th className="text-left p-2">Items</th>
 </tr>
-
 </thead>
 
 <tbody>
+
+{orders.length === 0 && (
+<tr>
+<td colSpan="4" className="text-center p-4 text-gray-500">
+No Orders Found
+</td>
+</tr>
+)}
 
 {orders.slice(0,5).map(o=>(
 
 <tr key={o._id} className="border-b">
 
-<td className="p-2">
-{o.customerName}
-</td>
+<td className="p-2">{o.customerName}</td>
+<td className="p-2">{o.phone}</td>
+<td className="p-2 font-bold">₹{o.total}</td>
 
 <td className="p-2">
-{o.phone}
-</td>
-
-<td className="p-2">
-₹{o.total}
+{o.items?.map((item,i)=>(
+<div key={i} className="text-sm">
+• {item.name} (₹{item.price})
+</div>
+))}
 </td>
 
 </tr>

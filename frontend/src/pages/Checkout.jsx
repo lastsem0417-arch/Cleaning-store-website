@@ -10,26 +10,22 @@ const [name,setName] = useState("")
 const [phone,setPhone] = useState("")
 const [address,setAddress] = useState("")
 
-const total = cart.reduce((sum,item)=>sum + item.price,0)
+// FIXED TOTAL
+const total = cart.reduce((sum,item)=>sum + item.price * item.quantity,0)
 
 const placeOrder = async()=>{
 
 try{
 
-// save order to database
-
 await API.post("/orders",{
-
 customerName:name,
 phone:phone,
 address:address,
 items:cart,
 total:total
-
 })
 
-// whatsapp message
-
+// WHATSAPP FIX
 const message = `
 New Order Received
 
@@ -39,7 +35,7 @@ Address: ${address}
 Total: ₹${total}
 `
 
-const ownerNumber = "919999999999" // replace with shop owner number
+const ownerNumber = "919428174003"
 
 const url = `https://wa.me/${ownerNumber}?text=${encodeURIComponent(message)}`
 
@@ -50,7 +46,6 @@ alert("Order placed successfully!")
 }catch(err){
 
 console.log(err)
-
 alert("Order failed")
 
 }
@@ -91,9 +86,7 @@ Total: ₹{total}
 onClick={placeOrder}
 className="bg-green-500 text-white px-4 py-2 rounded"
 >
-
 Place Order
-
 </button>
 
 </div>
